@@ -10,12 +10,12 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# MongoDB connection setup (replace with your MongoDB URI)
+
 MONGO_URI = "mongodb://localhost:27017/mini"
 client = MongoClient(MONGO_URI)
-db = client.get_database('mini')  # Replace 'mini' with your database name
-users_collection = db.users  # Collection to store user data
-files_collection = db.files  # Collection to store file metadata
+db = client.get_database('mini') 
+users_collection = db.users  
+files_collection = db.files  
 
 # Pinata API keys
 PINATA_API_KEY = "77b4123fbc26ddb4679f"
