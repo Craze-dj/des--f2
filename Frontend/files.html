@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Files</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1e2a, #3a3a55);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 60%;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .sort-btn {
+            background: #0072ff;
+            color: white;
+        }
+        .sort-btn:hover {
+            background: #00c6ff;
+        }
+        .delete-btn {
+            background: red;
+            color: white;
+        }
+        .delete-btn:hover {
+            background: darkred;
+        }
+        .download-btn {
+            background: #0072ff;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        th {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Uploaded Files</h1>
+
+    <!-- Search & Sorting -->
+    <div class="search-container">
+        <input type="text" id="searchBox" placeholder="Search files..." onkeyup="searchFiles()">
+        <button class="sort-btn" onclick="sortFiles('file_name')">Sort by Name</button>
+        <button class="sort-btn" onclick="sortFiles('upload_date')">Sort by Date</button>
+        <button class="sort-btn" onclick="sortFiles('file_type')">Sort by Type</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th onclick="sortFiles('file_name')">File Name</th>
+                <th onclick="sortFiles('upload_date')">Upload Date</th>
+                <th onclick="sortFiles('file_type')">File Type</th>
+                <th>Download</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody id="fileTable">
+            <!-- Files will be inserted here dynamically -->
+        </tbody>
+    </table>
+
+    <script>
+        let filesList = [];
+
+        async function fetchFiles() {
+            try {
+                const response = await fetch('http://127.0.0.1:5908/files');
+                filesList = await response.json();
+                displayFiles(filesList);
+            } catch (error) {
+                console.error('Error fetching files:', error);
+            }
+        }
+
+        function displayFiles(files) {
+            const fileTable = document.getElementById('fileTable');
+            fileTable.innerHTML = '';
+
+            if (files.length === 0) {
+                fileTable.innerHTML = '<tr><td colspan="5">No files found.</td></tr>';
+                return;
+            }
+
+            files.forEach(file => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${file.file_name}</td>
+                    <td>${new Date(file.upload_date).toLocaleString()}</td>
+                    <td>${file.file_type}</td>
+                    <td><a class="download-btn" href="https://gateway.pinata.cloud/ipfs/${file.ipfs_hash}" target="_blank">Download</a></td>
+                    <td><button class="delete-btn" onclick="deleteFile('${file.ipfs_hash}', this)">Delete</button></td>
+                `;
+                fileTable.appendChild(row);
+            });
+        }
+
+        function sortFiles(attribute) {
+            filesList.sort((a, b) => {
+                if (attribute === 'upload_date') {
+                    return new Date(a.upload_date) - new Date(b.upload_date);
+                }
+                return a[attribute].localeCompare(b[attribute]);
+            });
+            displayFiles(filesList);
+        }
+
+        function searchFiles() {
+            const query = document.getElementById('searchBox').value.toLowerCase();
+            const filteredFiles = filesList.filter(file => file.file_name.toLowerCase().includes(query));
+            displayFiles(filteredFiles);
+        }
+
+        async function deleteFile(ipfsHash, button) {
+            if (!confirm("Are you sure you want to delete this file?")) return;
+
+            try {
+                const response = await fetch(`http://127.0.0.1:5908/delete/${ipfsHash}`, { method: 'DELETE' });
+                const result = await response.json();
+
+                if (response.ok) {
+                    filesList = filesList.filter(file => file.ipfs_hash !== ipfsHash);
+                    displayFiles(filesList);
+                    alert('File deleted successfully!');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error deleting file: ' + error.message);
+            }
+        }
+
+        fetchFiles();
+    </script>
+</body>
+</html>

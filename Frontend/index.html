@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Sign Up | Decentralized Storage</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Body Styling */
+        body {
+            background: linear-gradient(135deg, #1e1e2a, #3a3a55);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Auth Container */
+        .auth-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .toggle-password {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .toggle-password input {
+            margin-right: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-size: 1rem;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            transform: scale(1.05);
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .success-message {
+            color: #0dcaf0;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .toggle {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .toggle a {
+            color: #00c6ff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .toggle a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Login Form -->
+        <form id="login-form">
+            <h2>Login</h2>
+            <div class="input-group">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" placeholder="you@example.com">
+            </div>
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <div class="toggle-password">
+                <input type="checkbox" id="show-password-login"> <label for="show-password-login">Show Password</label>
+            </div>
+            <button type="button" onclick="validateLogin()">LOGIN</button>
+            <div id="login-message-box"></div>
+            <p class="toggle">Don't have an account? <a href="#" onclick="toggleForm()">Sign Up</a></p>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signup-form" style="display: none;">
+            <h2>Sign Up</h2>
+            <div class="input-group">
+                <label for="signup-email">Email Address</label>
+                <input type="email" id="signup-email" placeholder="you@example.com">
+            </div>
+            <div class="input-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Create a password">
+            </div>
+            <div class="toggle-password">
+                <input type="checkbox" id="show-password-signup"> <label for="show-password-signup">Show Password</label>
+            </div>
+            <button type="button" onclick="registerUser()">SIGN UP</button>
+            <div id="signup-message-box"></div>
+            <p class="toggle">Already have an account? <a href="#" onclick="toggleForm()">Login</a></p>
+        </form>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        function validateLogin() {
+            const email = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value.trim();
+            const messageBox = document.getElementById("login-message-box");
+
+            messageBox.innerHTML = "";
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                messageBox.innerHTML = "<div class='success-message'>Login successful! Redirecting...</div>";
+                setTimeout(() => window.location.href = "dashboard.html", 1500);
+            } else {
+                messageBox.innerHTML = "<div class='error-message'>Incorrect email or password.</div>";
+            }
+        }
+
+        function registerUser() {
+            const email = document.getElementById("signup-email").value.trim();
+            const password = document.getElementById("signup-password").value.trim();
+            const messageBox = document.getElementById("signup-message-box");
+
+            messageBox.innerHTML = "";
+            if (!email || !password) {
+                messageBox.innerHTML = "<div class='error-message'>Please fill in both email and password.</div>";
+                return;
+            }
+
+            if (users.find(u => u.email === email)) {
+                messageBox.innerHTML = "<div class='error-message'>Email already exists. Please log in.</div>";
+                return;
+            }
+
+            users.push({ email, password });
+            localStorage.setItem('users', JSON.stringify(users));
+
+            messageBox.innerHTML = "<div class='success-message'>Sign-up successful! Redirecting...</div>";
+            setTimeout(() => window.location.href = "dashboard.html", 1500);
+        }
+
+        function toggleForm() {
+            document.getElementById("login-form").style.display = document.getElementById("login-form").style.display === "none" ? "block" : "none";
+            document.getElementById("signup-form").style.display = document.getElementById("signup-form").style.display === "none" ? "block" : "none";
+        }
+
+        document.getElementById('show-password-login').addEventListener('change', function () {
+            document.getElementById('login-password').type = this.checked ? 'text' : 'password';
+        });
+
+        document.getElementById('show-password-signup').addEventListener('change', function () {
+            document.getElementById('signup-password').type = this.checked ? 'text' : 'password';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decentralized File Storage</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Body Styling */
+        body {
+            background: linear-gradient(135deg, #1e1e2a, #3a3a55);
+            color: #fff;
+            text-align: center;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        .nav-links li {
+            display: inline;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #00c6ff;
+        }
+
+        /* Upload Section */
+        .upload-container {
+            flex-grow: 1; /* Pushes footer down */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 20px;
+        }
+
+        .upload-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: bounce 1.5s infinite alternate;
+            color: #00c6ff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            display: block;
+            background: #0072ff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .file-label:hover {
+            background: #00c6ff;
+            transform: scale(1.05);
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .upload-btn:hover {
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            transform: scale(1.05);
+        }
+
+        #result {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f9a825;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Footer */
+        footer {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-align: center;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 5px rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">storeza</div>
+        <ul class="nav-links">
+            <li><a href="#">Files</a></li>
+            <li><a href="#">Download</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+        </ul>
+    </nav>
+
+    <!-- Upload Section -->
+    <div class="upload-container">
+        <div class="upload-card">
+            <div class="upload-icon">📁</div>
+            <label for="fileInput" class="file-label">Choose File</label>
+            <input type="file" name="file" id="fileInput" required />
+            <button class="upload-btn" onclick="uploadFile()">Upload 🔼</button>
+        </div>
+    </div>
+
+    <p id="result"></p>
+
+    <!-- Footer at Bottom -->
+    <footer>
+        <p>Powered by bong</p>
+    </footer>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) {
+                document.getElementById('result').innerText = '⚠️ Error: Please choose a file.';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            // Example email handling; replace with your logic
+            const email = "shwethakm7676@gmail.com";
+            formData.append("email", email);
+
+            document.getElementById('result').innerText = '⏳ Uploading file...';
+
+            try {
+                const response = await fetch('http://127.0.0.1:5908/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').innerHTML = `✅ File uploaded successfully!<br>IPFS Hash: <b>${result.ipfs_hash}</b>`;
+                } else {
+                    document.getElementById('result').innerText = `❌ Error: ${result.error}`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
